@@ -1,4 +1,41 @@
-export async function POST(req) {
-  const body = await req.json();
-  return new Response(JSON.stringify({ message: "OK" }), { status: 200 });
+export async function GET() {
+  return json({
+    ok: true,
+    route: '/api/chat',
+    hasApiKey: !!process.env.ANTHROPIC_API_KEY,
+    message: process.env.ANTHROPIC_API_KEY ? 'API key detected.' : 'Missing ANTHROPIC_API_KEY environment variable.'
+  });
+}
+
+export async function POST(request) {
+  try {
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) return json({ error: 'Missing ANTHROPIC_API_KEY environment variable.' }, 500);
+
+    const body = await request.json();
+    const anthropicResponse = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify(body)
+    });
+
+    const text = await anthropicResponse.text();
+    return new Response(text, {
+      status: anthropicResponse.status,
+      headers: { 'content-type': 'application/json', 'cache-control': 'no-store' }
+    });
+  } catch (error) {
+    return json({ error: 'Proxy request failed', details: error.message || String(error) }, 500);
+  }
+}
+
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { 'content-type': 'application/json', 'cache-control': 'no-store' }
+  });
 }
