@@ -1,10 +1,565 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Week 8 AI Simulator</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Week 8 AI Simulator | Rise to Lead</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --deep:#00313C; --mid:#074E59; --teal:#005D67; --peach:#F1CEB3; --cream:#F0E9E0;
+  --panel:#062a33; --line:rgba(255,255,255,.08); --muted:rgba(255,255,255,.62); --text:#ffffff;
+  --danger:#C0392B; --success:#1A7A5E; --card:#f5f0ea; --ink:#143640;
+}
+*{box-sizing:border-box} html,body{margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink)}
+button,textarea{font-family:inherit}
+#landing{display:block}
+.hero{background:linear-gradient(180deg,var(--deep),var(--teal)); color:#fff; padding:24px 24px 0}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;border:1px solid rgba(241,206,179,.25);background:rgba(241,206,179,.08);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--peach)}
+.hero h1{font-family:'DM Serif Display',serif;font-size:68px;line-height:.95;margin:18px 0 12px}
+.hero h1 em{font-style:italic;color:var(--peach)}
+.hero p{max-width:980px;font-size:18px;line-height:1.55;color:rgba(255,255,255,.86);margin:0 0 24px}
+.warn{border:1px solid rgba(241,206,179,.18); background:rgba(241,206,179,.06); color:var(--peach); border-radius:14px; padding:14px 18px; font-size:14px; line-height:1.5; margin-bottom:24px}
+.stats{display:flex;gap:52px;padding:0 0 28px}
+.stat strong{display:block;font-size:22px;color:var(--peach)}
+.stat span{display:block;margin-top:5px;font-size:13px;color:rgba(255,255,255,.68);text-transform:uppercase;letter-spacing:.06em}
+.strip{background:#135d69;color:#fff;padding:14px 24px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.strip .lbl{font-weight:700;letter-spacing:.06em}
+.pill{padding:6px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.12);font-size:13px}
+.strip .txt{font-size:14px;color:rgba(255,255,255,.82)}
+.gridWrap{padding:22px 24px 32px}
+.gridLabel{font-size:13px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#6c8390;margin-bottom:10px}
+.gridNote{font-size:14px;color:#68808c;margin-bottom:18px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.card{background:#f8f5f0;border:1px solid #d7dde0;border-radius:20px;padding:20px;box-shadow:0 1px 0 rgba(0,49,60,.02)}
+.card .num{font-family:'DM Serif Display',serif;font-size:54px;line-height:1;color:#d5dbde;margin-bottom:10px}
+.tagRow{display:flex;justify-content:space-between;align-items:start;gap:8px}
+.card h3{font-family:'DM Serif Display',serif;font-size:20px;color:var(--deep);margin:0 0 8px}
+.card .sub{font-size:14px;color:#708591;margin-bottom:14px}
+.tags{display:flex;gap:8px;flex-wrap:wrap}
+.tag{font-size:12px;padding:5px 10px;border-radius:999px;background:#e8eef1;color:#3a6d93;font-weight:700}
+.skill{font-size:14px;color:var(--teal);font-weight:700;line-height:1.45;margin-bottom:12px}
+.persona{background:#e7dfd8;border-radius:12px;padding:12px 14px;color:#6d7f89;font-size:14px;line-height:1.45;margin-bottom:14px}
+.persona strong{display:block;color:var(--deep);margin-bottom:4px}
+.startBtn{width:100%;border:none;background:var(--deep);color:#fff;border-radius:12px;padding:13px 16px;font-weight:700;font-size:16px;cursor:pointer}
+.startBtn:hover{background:#0a4754}
+#sim{display:none;height:100vh;background:var(--cream)}
+.sim-hdr{background:var(--deep);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.06)}
+.hleft{display:flex;align-items:center;gap:12px}
+.back{width:34px;height:34px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0c4450;color:#fff;cursor:pointer;font-size:22px;line-height:1}
+.hmeta small{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.58);font-weight:700}
+.hmeta h2{margin:2px 0 0;font-family:'DM Serif Display',serif;font-size:20px}
+.hbtns{display:flex;align-items:center;gap:10px}
+.btn{border:1px solid rgba(255,255,255,.14);background:#0c4450;color:#fff;border-radius:12px;padding:10px 14px;font-size:14px;font-weight:700;cursor:pointer}
+.btn.peach{background:var(--peach);color:var(--deep);border:none}
+.ribbon{background:#135d69;color:#d8eef2;padding:10px 22px;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+.ribbon .rightBadge{padding:6px 12px;border-radius:999px;border:1px solid rgba(241,206,179,.32);background:rgba(241,206,179,.1);color:#f6d8c4;font-weight:700}
+.sim-body{display:grid;grid-template-columns:260px 1fr 300px;height:calc(100vh - 89px);min-height:0}
+.ctx{background:#032c35;color:#fff;padding:18px 0;overflow-y:auto}
+.cs{padding:0 18px 18px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:18px}
+.cl{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:#b99d52;font-weight:700;margin-bottom:12px}
+.crc{background:#0f3e48;border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:14px}
+.crn{font-weight:700;font-size:16px;margin-bottom:6px}
+.crd,.ct2{font-size:13px;line-height:1.55;color:rgba(255,255,255,.82)}
+.obj{font-style:italic}
+.kpis{display:flex;flex-direction:column;gap:10px}
+.kpi .row{display:flex;justify-content:space-between;font-size:12px;color:#d6e7ea;margin-bottom:4px}
+.bar{height:10px;border-radius:999px;background:#12424b;overflow:hidden}
+.fill{height:100%;border-radius:999px}
+.tips{font-size:12px;color:#cfe0e3;line-height:1.55}
+.chatCol{display:flex;flex-direction:column;min-width:0;border-right:1px solid #d7dddf}
+.msgs{flex:1;overflow-y:auto;padding:22px 18px 18px;background:#ebe5dd}
+.msg-wrap{display:flex;gap:8px;align-items:flex-start;margin-bottom:14px}
+.msg-wrap.user{justify-content:flex-end}
+.avatar{width:28px;height:28px;border-radius:8px;background:#033c48;color:#f4d0b7;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex:0 0 auto}
+.bub-box{max-width:78%}
+.msg-name{font-size:11px;font-weight:700;color:#6e8a92;margin-bottom:4px}
+.bubble{background:white;border:1px solid #e0e5e7;border-radius:14px;padding:12px 14px;color:var(--ink);font-size:14px;line-height:1.55}
+.user .bubble{background:var(--deep);color:#fff;border-color:transparent}
+.typing{display:none;background:#fff;border:1px solid #e0e5e7;border-radius:14px;padding:12px 14px;width:80px}
+.typing span{display:inline-block;width:7px;height:7px;border-radius:50%;background:#8ea2aa;animation:b 1s infinite;margin-right:4px}
+.typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s;margin-right:0}
+@keyframes b{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+.spk{border:none;background:transparent;color:#6e8a92;cursor:pointer;padding:0 4px}
+.spk.playing{color:var(--teal)}
+.inputWrap{border-top:1px solid #d5dbde;background:#f8f5f0;padding:10px 16px 12px}
+.inputRow{display:flex;gap:10px;align-items:flex-end}
+.mic{width:42px;height:42px;border-radius:12px;border:1px solid #d2d9dc;background:#e8dfd7;color:#684f49;cursor:pointer}
+.mic.on{background:var(--danger);color:#fff;border-color:var(--danger)}
+.input{flex:1;min-height:42px;max-height:130px;border-radius:12px;border:1.5px solid #cfa85c;background:#f2ede7;padding:12px 14px;font-size:15px;line-height:1.45;resize:none;outline:none;color:var(--ink)}
+.send{width:42px;height:42px;border:none;border-radius:12px;background:var(--deep);color:#fff;cursor:pointer;font-size:18px}
+.hints{display:flex;justify-content:space-between;align-items:center;padding:8px 2px 0;font-size:11px;color:#7e8f95}
+.right{background:#f6f5f3;padding:16px;overflow-y:auto}
+.otitle{font-family:'DM Serif Display',serif;font-size:28px;color:var(--deep);margin-bottom:4px}
+.osub{font-size:14px;color:#7b8c93;margin-bottom:12px}
+.chkItem{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid #e2e7e9}
+.chkBox{width:19px;height:19px;border-radius:6px;border:2px solid #c3cfd2;cursor:pointer;flex:0 0 auto}
+.chkBox.checked{background:var(--teal);border-color:var(--teal);position:relative}
+.chkBox.checked:after{content:"✓";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700}
+.chkText{font-size:14px;color:#6e8088;line-height:1.45}
+.aiSug{margin-top:16px;font-size:12px;color:#97a4a9;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.sugg{font-size:14px;color:#7b8b91;margin:8px 0 14px}
+.scoreBox{background:#e8dfd7;border-radius:14px;padding:18px;text-align:center}
+.scoreBox strong{display:block;font-size:28px;color:var(--deep)}
+.scoreBox span{display:block;font-size:13px;color:#91a0a6;margin-top:4px}
+.fabCol{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:12px}
+.fab{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid #d9dfe2;box-shadow:0 8px 20px rgba(0,0,0,.12);cursor:pointer}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:24px}
+.modal.show{display:flex}
+.modalCard{width:min(820px,100%);max-height:85vh;overflow:auto;background:var(--deep);color:#fff;border-radius:18px;border:1px solid rgba(255,255,255,.12)}
+.modalHdr{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.08)}
+.modalHdr h3{margin:0;font-family:'DM Serif Display',serif;font-size:26px}
+.close{width:34px;height:34px;border-radius:50%;border:none;background:rgba(255,255,255,.1);color:#fff;cursor:pointer}
+.modalBody{padding:20px;line-height:1.7}
+.modalBody h3{color:var(--peach);font-family:'DM Serif Display',serif;margin:16px 0 6px}
+.sgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:12px 0}
+.sv{background:rgba(255,255,255,.07);border-radius:12px;padding:12px;text-align:center}
+.sv .sn2{font-size:24px;font-weight:800;color:var(--peach)}
+.sv .sl{font-size:11px;color:rgba(255,255,255,.6)}
+@media (max-width:1200px){.sim-body{grid-template-columns:240px 1fr 280px}}
+@media (max-width:1024px){.grid{grid-template-columns:1fr}.sim-body{grid-template-columns:1fr}.ctx,.right{display:none}.hero h1{font-size:54px}}
+</style>
 </head>
 <body>
-<h1>Week 8 AI Simulator - Matched Week 7 UI</h1>
-<p>This is the production-ready placeholder. Replace with full version if needed.</p>
+<div id="landing">
+  <div class="hero">
+    <div class="badge">✦ Rise to Lead: Foundations – Week 8</div>
+    <h1>Change & Innovation<br><em>Simulator</em></h1>
+    <p>Three high-stakes change conversations powered by live AI. Your team members resist, question, and hesitate when the change is unclear, too fast, or badly framed. Your job is to lead the shift with clarity, credibility, and care.</p>
+    <div class="warn">These simulations test whether you can lead change without creating confusion, panic, or passive resistance.</div>
+    <div class="stats">
+      <div class="stat"><strong>3</strong><span>Scenarios</span></div>
+      <div class="stat"><strong>AI</strong><span>Live responses</span></div>
+      <div class="stat"><strong>4C</strong><span>Model applied</span></div>
+      <div class="stat"><strong>Executive</strong><span>Coaching feedback</span></div>
+    </div>
+  </div>
+  <div class="strip">
+    <span class="lbl">4C MODEL:</span>
+    <span class="pill">C1 Clarity</span><span class="pill">C2 Consistency</span><span class="pill">C3 Credibility</span><span class="pill">C4 Care</span>
+    <span class="txt">Change fails when people do not understand what is changing, why now, and what it means for them.</span>
+  </div>
+  <div class="gridWrap">
+    <div class="gridLabel">Click any scenario to begin your simulation</div>
+    <div class="gridNote"></div>
+    <div class="grid" id="grid"></div>
+  </div>
+</div>
+
+<div id="sim">
+  <div class="sim-hdr">
+    <div class="hleft">
+      <button class="back" id="backBtn">‹</button>
+      <div class="hmeta"><small id="simNum">Simulation 01</small><h2 id="simTitle">Title</h2></div>
+    </div>
+    <div class="hbtns">
+      <button class="btn" id="obsBtn">☑ Observer</button>
+      <button class="btn peach" id="coachBtn">Get Coaching Feedback</button>
+    </div>
+  </div>
+  <div class="ribbon">
+    <span id="simSub">Subtitle</span>
+    <span class="rightBadge">Change & Innovation</span>
+  </div>
+  <div class="sim-body">
+    <div class="ctx">
+      <div class="cs">
+        <div class="cl">AI is playing</div>
+        <div class="crc"><div class="crn" id="ctxName"></div><div class="crd" id="ctxDesc"></div></div>
+      </div>
+      <div class="cs"><div class="cl">Situation</div><div class="ct2" id="ctxSituation"></div></div>
+      <div class="cs"><div class="cl">Your objective</div><div class="ct2 obj" id="ctxObjective"></div></div>
+      <div class="cs"><div class="cl">4C dimensions tested</div><div id="ctxDims"></div></div>
+      <div class="cs"><div class="cl">Conversation stage</div><div><span class="pill" id="stagePill">Opening</span></div>
+        <div class="kpis" style="margin-top:16px">
+          <div class="kpi"><div class="row"><span>Trust</span><span id="trustVal">32%</span></div><div class="bar"><div class="fill" id="trustBar" style="width:32%;background:#4fd0a8"></div></div></div>
+          <div class="kpi"><div class="row"><span>Resistance</span><span id="resVal">68%</span></div><div class="bar"><div class="fill" id="resBar" style="width:68%;background:#f16a5f"></div></div></div>
+          <div class="kpi"><div class="row"><span>Adoption Readiness</span><span id="adoptVal">24%</span></div><div class="bar"><div class="fill" id="adoptBar" style="width:24%;background:#f1ce83"></div></div></div>
+        </div>
+      </div>
+      <div class="cs"><div class="cl">Tips</div><div class="tips" id="tips"></div></div>
+    </div>
+    <div class="chatCol">
+      <div class="msgs" id="msgs"></div>
+      <div class="inputWrap">
+        <div class="inputRow">
+          <button class="mic" id="micBtn">🎤</button>
+          <textarea class="input" id="input" placeholder="Type your response as the manager..."></textarea>
+          <button class="send" id="sendBtn">➤</button>
+        </div>
+        <div class="hints"><span>Enter to send · Shift+Enter new line</span><span id="micHint">Click mic to start continuous recording</span></div>
+        <div id="apiStat" style="font-size:10px;color:#8ea1a7;margin-top:6px">Checking AI connection...</div>
+      </div>
+    </div>
+    <div class="right" id="rightPanel">
+      <div class="otitle">Observer Checklist</div>
+      <div class="osub">Check behaviors you demonstrate</div>
+      <div id="checklist"></div>
+      <div class="aiSug">AI suggestions</div>
+      <div class="sugg" id="sugg">No suggestions yet.</div>
+      <div class="scoreBox"><strong><span id="scoreNum">0</span>/<span id="scoreTotal">0</span></strong><span>behaviors demonstrated</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="fabCol">
+  <button class="fab" id="fabObs">◐</button>
+  <button class="fab" id="fabPalette">🎨</button>
+</div>
+
+<div class="modal" id="coachModal">
+  <div class="modalCard">
+    <div class="modalHdr"><h3>Coaching Feedback</h3><button class="close" id="closeCoach">✕</button></div>
+    <div class="modalBody" id="coachBody"><div style="padding:40px;text-align:center;color:#9fb2b9">Analysing your change conversation...</div></div>
+  </div>
+</div>
+
+<script>
+const SCENARIOS = [
+  {
+    num:"01",
+    title:"The Catalogue Tagging Reset",
+    sub:"Product taxonomy change before Mother’s Day goes live",
+    category:["Adoption","Clarity"],
+    persona:{name:"Maha Al-Kandari", initials:"MA", desc:"Catalogue Coordinator · 2 years at Floward · strong operator, frustrated by last-minute changes"},
+    situation:"A new search-tagging taxonomy must go live before the Mother’s Day product push. Maha has already tagged 420 SKUs under the old structure. Product says the new taxonomy will improve conversion and filtering, but the operational impact lands on her team today.",
+    objective:"Explain the change clearly, acknowledge the operational hit, and secure commitment without sounding detached or unrealistic.",
+    c4:["C1 Clarity","C2 Consistency","C4 Care"],
+    tips:["Name exactly what is changing, by when, and what stays the same","Acknowledge the rework cost without apologising for the decision itself","Give a realistic path: what gets reprioritised, who supports, when you will check in"],
+    checklist:["Manager clearly explained what is changing and why now","Manager acknowledged the rework effort without becoming defensive","Manager named what will be deprioritised to make room for the change","Manager gave a realistic timing or support plan","Manager asked for Maha’s biggest blocker","Manager ended with a concrete next step and check-in"],
+    opening:'I saw the new taxonomy file land just now. We have already tagged 420 SKUs under the old structure for Mother’s Day. Are we seriously redoing this again today?',
+    system:`You are Maha Al-Kandari, Catalogue Coordinator at Floward. A new product taxonomy was just dropped before the Mother’s Day push. You and your team have already tagged 420 SKUs under the old structure. This is not your first late change.
+
+Hidden psychology: you are tired of absorbing late upstream decisions. You are not rebellious, but you are skeptical because the pain of the change lands on you while the upside is described in abstract terms.
+
+If the manager is vague, upbeat, or detached, increase resistance and question the practicality. If the manager is specific, honest about trade-offs, and gives a real support plan, you begin to engage.
+
+Keep responses to 2-4 sentences. Stay realistic and slightly strained, not dramatic.`
+  },
+  {
+    num:"02",
+    title:"The AI Copy Pilot Pushback",
+    sub:"Content team resists a pilot for assisted gifting-copy generation",
+    category:["Innovation","Credibility"],
+    persona:{name:"Yousef Al-Harbi", initials:"YH", desc:"Senior Content Specialist · 3 years at Floward · proud of craft, suspicious of shortcuts"},
+    situation:"Marketing and Product want to pilot AI-assisted copy generation for selected gifting categories ahead of Eid. Yousef believes the tool will flatten Floward’s premium voice and create more editing work, not less. The pilot starts next week unless he buys in.",
+    objective:"Position the pilot as a controlled test, protect brand standards, and get Yousef to engage without feeling replaced.",
+    c4:["C3 Credibility","C4 Care","C1 Clarity"],
+    tips:["Frame the pilot as an experiment with guardrails, not a philosophy debate","Protect craftsmanship explicitly - quality bar stays human","Define success measures and where Yousef’s expertise is essential"],
+    checklist:["Manager defined the pilot scope clearly","Manager protected premium brand standards explicitly","Manager stated that human review remains mandatory","Manager explained how success will be measured","Manager positioned Yousef as critical to the pilot, not threatened by it","Manager addressed fear without over-reassuring"],
+    opening:'I read the pilot note. If this is just a cheaper way to flood the site with flat AI copy, I am not interested. We spent years building a premium voice.',
+    system:`You are Yousef Al-Harbi, Senior Content Specialist at Floward. You care deeply about writing quality and premium brand expression. An AI-assisted copy pilot has been announced for selected gifting categories before Eid.
+
+Hidden psychology: you fear loss of craft, dilution of standards, and being reduced to a proofreader for weak drafts. You are articulate and not afraid to challenge shallow innovation language.
+
+If the manager treats this as inevitable hype, you push back harder. If the manager sets guardrails, protects the brand, and makes your role central to quality control, you become more open.
+
+Keep responses to 2-4 sentences. Sound intelligent, skeptical, and proud of your standards.`
+  },
+  {
+    num:"03",
+    title:"The Routing Pilot Rumor",
+    sub:"Operations team fears a batching pilot will damage the customer promise",
+    category:["Change","Resistance"],
+    persona:{name:"Dalia Hassan", initials:"DH", desc:"Ops Supervisor · 5 years at Floward · trusted by riders, worried about service slippage"},
+    situation:"Operations will pilot a new batching and route-clustering model in Kuwait to reduce rider idle time during Eid week. Rumors on the floor say this means later deliveries and angry customers. Dalia is hearing concern from riders and pick-pack teams before the pilot even starts.",
+    objective:"Stabilise the team, explain the pilot honestly, and secure Dalia’s support in how the change is introduced on the floor.",
+    c4:["C1 Clarity","C2 Consistency","C3 Credibility"],
+    tips:["Kill rumor with specifics - what is and is not changing","Acknowledge service risk but show the safeguards","Use Dalia as a stabiliser, not just a recipient of change"],
+    checklist:["Manager clearly separated rumor from fact","Manager named pilot safeguards and success criteria","Manager explained what happens if service drops","Manager asked what the floor is already saying","Manager invited Dalia into rollout support","Manager ended with a clear message Dalia can repeat to the team"],
+    opening:'The riders are already saying this batching pilot means later deliveries and more complaints. I need to know what I am supposed to tell them because right now it sounds like we are gambling with the customer promise.',
+    system:`You are Dalia Hassan, Ops Supervisor at Floward. A new batching and route-clustering pilot is about to begin in Kuwait before Eid week. Rumors on the floor say the pilot will mean later deliveries and more complaints.
+
+Hidden psychology: you care about execution credibility. Once the floor feels management is experimenting on service, trust drops fast. You want specifics you can repeat back to the team.
+
+If the manager hand-waves or sounds overconfident, you get sharper. If the manager is clear about what is changing, what is safeguarded, and what happens if service drops, you become an ally.
+
+Keep responses to 2-4 sentences. Grounded, practical, and protective of service quality.`
+  }
+];
+
+let active = null, history = [], checks = {}, isTyping = false, micOn = false, recognition = null, currentUtterance = null, voicesLoaded = false;
+const el = id => document.getElementById(id);
+
+function renderLanding(){
+  const grid = el('grid');
+  grid.innerHTML = SCENARIOS.map((s,i)=>`
+    <div class="card">
+      <div class="tagRow">
+        <div class="num">${s.num}</div>
+        <div class="tags">${s.category.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+      </div>
+      <h3>${s.title}</h3>
+      <div class="sub">${s.sub}</div>
+      <div class="skill">${escapeHtml(s.objective)}</div>
+      <div class="persona"><strong>${s.persona.name}</strong>${s.persona.desc}</div>
+      <button class="startBtn" onclick="openSim(${i})">Start Simulation →</button>
+    </div>
+  `).join('');
+}
+function escapeHtml(s){return s.replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+function openSim(i){
+  active = SCENARIOS[i]; history=[]; checks={}; stopSpeaking(); stopMic(true);
+  el('landing').style.display='none'; el('sim').style.display='block';
+  el('simNum').textContent=`Simulation ${active.num}`; el('simTitle').textContent=active.title; el('simSub').textContent=active.sub;
+  el('ctxName').textContent=active.persona.name; el('ctxDesc').textContent=active.persona.desc;
+  el('ctxSituation').textContent=active.situation; el('ctxObjective').textContent=active.objective;
+  el('ctxDims').innerHTML = active.c4.map(x=>`<span class="pill" style="margin-right:6px">${x}</span>`).join('');
+  el('tips').innerHTML = active.tips.map(t=>`→ ${t}`).join('<br>');
+  el('msgs').innerHTML='';
+  renderChecklist();
+  setSignals(32,68,24,'Opening');
+  setSuggestion('No suggestions yet.');
+  el('input').value=''; autoGrow(el('input'));
+  pingApi();
+  setTimeout(()=>{ addAIMessage(active.opening, active.persona.name, active.persona.initials, true); history.push({role:'assistant', content: active.opening}); }, 200);
+}
+function backToLanding(){ stopSpeaking(); stopMic(true); el('sim').style.display='none'; el('landing').style.display='block'; }
+function renderChecklist(){
+  el('scoreTotal').textContent = active.checklist.length;
+  const c = el('checklist');
+  c.innerHTML = active.checklist.map((t,idx)=>`
+    <div class="chkItem">
+      <div class="chkBox ${checks[idx]?'checked':''}" onclick="toggleCheck(${idx})"></div>
+      <div class="chkText">${t}</div>
+    </div>`).join('');
+  updateScore();
+}
+function toggleCheck(idx){ checks[idx]=!checks[idx]; renderChecklist(); }
+function updateScore(){ el('scoreNum').textContent = Object.values(checks).filter(Boolean).length; }
+function addAIMessage(text,name,initials,withSpeak=false){
+  const row = document.createElement('div'); row.className='msg-wrap';
+  row.innerHTML = `<div class="avatar">${initials}</div>
+    <div class="bub-box">
+      <div class="msg-name">${name}</div>
+      <div class="bubble">${escapeHtml(text)}</div>
+    </div>
+    <button class="spk" title="Listen to AI reply">🔊</button>`;
+  const spk = row.querySelector('.spk');
+  spk.onclick = ()=>speakText(text, name, spk);
+  el('msgs').appendChild(row); scrollBottom();
+  if(withSpeak===true){} // no auto-speak
+}
+function addUserMessage(text){
+  const row = document.createElement('div'); row.className='msg-wrap user';
+  row.innerHTML = `<div class="bub-box"><div class="msg-name">You</div><div class="bubble">${escapeHtml(text)}</div></div>`;
+  el('msgs').appendChild(row); scrollBottom();
+}
+function showTyping(){
+  const row = document.createElement('div'); row.className='msg-wrap'; row.id='typingRow';
+  row.innerHTML = `<div class="avatar">AI</div><div class="typing" style="display:block"><span></span><span></span><span></span></div>`;
+  el('msgs').appendChild(row); scrollBottom();
+}
+function hideTyping(){ const t = el('typingRow'); if(t) t.remove(); }
+function scrollBottom(){ el('msgs').scrollTop = el('msgs').scrollHeight; }
+function autoGrow(t){ t.style.height='auto'; t.style.height = Math.min(t.scrollHeight,130)+'px'; }
+
+async function pingApi(){
+  try{
+    const r = await fetch('/api/chat', {method:'GET'});
+    const j = await r.json();
+    el('apiStat').textContent = j.hasApiKey ? 'AI connected · Ready' : 'AI key missing';
+  }catch(e){ el('apiStat').textContent = 'AI route unavailable'; }
+}
+function currentStage(){
+  if(history.length <= 2) return 'Opening';
+  if(history.length <= 6) return 'Exploring';
+  return 'Commitment';
+}
+function updateSignalsFromReply(reply){
+  let trust = parseInt(el('trustVal').textContent)||32;
+  let resistance = parseInt(el('resVal').textContent)||68;
+  let adoption = parseInt(el('adoptVal').textContent)||24;
+  const lower = reply.toLowerCase();
+  if(/okay|fine|that makes sense|i can work with that|fair/.test(lower)){ trust+=8; resistance-=10; adoption+=12; }
+  else if(/not interested|again|seriously|why|don't|not convinced|gambling/.test(lower)){ trust-=2; resistance+=6; adoption-=4; }
+  trust = Math.max(10, Math.min(95, trust));
+  resistance = Math.max(5, Math.min(95, resistance));
+  adoption = Math.max(5, Math.min(95, adoption));
+  setSignals(trust,resistance,adoption,currentStage());
+}
+function setSignals(trust,resistance,adoption,stage){
+  el('trustVal').textContent = `${trust}%`; el('trustBar').style.width=`${trust}%`;
+  el('resVal').textContent = `${resistance}%`; el('resBar').style.width=`${resistance}%`;
+  el('adoptVal').textContent = `${adoption}%`; el('adoptBar').style.width=`${adoption}%`;
+  el('stagePill').textContent = stage;
+}
+function setSuggestion(text){ el('sugg').textContent = text; }
+
+async function sendMessage(){
+  if(!active || isTyping) return;
+  const input = el('input');
+  const text = input.value.trim();
+  if(!text) return;
+  stopSpeaking();
+  stopMic(true);
+  input.value=''; autoGrow(input);
+  addUserMessage(text);
+  history.push({role:'user', content:text});
+  isTyping = true; showTyping();
+
+  const sys = `${active.system}
+
+You are in a Floward change and innovation simulator.
+Stay fully in character.
+Respond in 2 to 4 natural sentences.
+Do not break the fourth wall.
+If the manager is vague, generic, over-reassuring, or avoids trade-offs, increase resistance.
+If the manager is specific, honest about impact, and clear on support, trust can rise.
+Focus on Floward operational reality, premium brand standards, and real workload implications.`;
+  try{
+    const r = await fetch('/api/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens: 500,
+        system: sys,
+        messages: history
+      })
+    });
+    const data = await r.json();
+    hideTyping();
+    isTyping = false;
+    if(!r.ok){
+      addAIMessage(`I am not getting a clear answer yet. (${data.error?.message || data.error || 'API error'})`, active.persona.name, active.persona.initials);
+      return;
+    }
+    const reply = data.content?.[0]?.text || 'I need a clearer answer from you.';
+    addAIMessage(reply, active.persona.name, active.persona.initials);
+    history.push({role:'assistant', content: reply});
+    updateSignalsFromReply(reply);
+    if(/what is changing|who will help|what happens if|what does that mean|what are we stopping/.test(reply.toLowerCase())){
+      setSuggestion('Be more specific. Name what is changing, what is not changing, and what support or trade-off you are making.');
+    }else if(/okay|i can work with that|that makes sense/.test(reply.toLowerCase())){
+      setSuggestion('Good. Now lock the next step: owner, timing, and check-in.');
+    }else{
+      setSuggestion('Anchor the change with specifics: what changes today, what stays stable, and what support the team gets.');
+    }
+  }catch(e){
+    hideTyping(); isTyping = false;
+    addAIMessage('There was a connection issue. Please try again.', active.persona.name, active.persona.initials);
+  }
+}
+async function getCoaching(){
+  if(history.length < 4){ alert('Have at least 2 to 3 exchanges before requesting coaching feedback.'); return; }
+  el('coachModal').classList.add('show');
+  el('coachBody').innerHTML = '<div style="padding:40px;text-align:center;color:#9fb2b9">Analysing your change conversation...</div>';
+  const conv = history.map(m => `${m.role==='user'?'MANAGER (You)':active.persona.name}: ${m.content}`).join('\n\n');
+  const prompt = `You are an executive leadership coach at Floward. Provide coaching feedback on this Week 8 Change and Innovation simulation.
+
+SCENARIO: "${active.title}"
+KEY SKILL: ${active.objective}
+4C DIMENSIONS: ${active.c4.join(', ')}
+CHECKLIST SCORE: ${Object.values(checks).filter(Boolean).length}/${active.checklist.length}
+
+CONVERSATION:
+${conv}
+
+Return HTML only using this exact structure:
+<h3>Overall Assessment</h3>
+<p>Rate 1 to 10 and give the single most important observation.</p>
+<div class="sgrid">
+  <div class="sv"><div class="sn2">X/10</div><div class="sl">Clarity</div></div>
+  <div class="sv"><div class="sn2">X/10</div><div class="sl">Credibility</div></div>
+  <div class="sv"><div class="sn2">X/10</div><div class="sl">Care</div></div>
+  <div class="sv"><div class="sn2">X/10</div><div class="sl">Adoption Leadership</div></div>
+</div>
+<h3>The Defining Moment</h3><p>Quote the exact moment that shaped the outcome.</p>
+<h3>What Landed Well</h3><p>2 to 3 specific behaviors that worked.</p>
+<h3>The Critical Gap</h3><p>What the manager did not make concrete enough.</p>
+<h3>Floward Risk</h3><p>If this change message was repeated at scale, what organizational risk would it create?</p>
+<h3>One Line to Remember</h3><p>One sentence to carry into the next change conversation.</p>`;
+  try{
+    const r = await fetch('/api/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:1200, messages:[{role:'user', content: prompt}] })
+    });
+    const data = await r.json();
+    el('coachBody').innerHTML = data.content?.[0]?.text || '<p>Unable to generate feedback.</p>';
+  }catch(e){
+    el('coachBody').innerHTML = '<p style="padding:20px">Unable to generate coaching feedback right now.</p>';
+  }
+}
+
+function loadVoices(){ speechSynthesis.getVoices(); voicesLoaded = true; }
+function chooseVoice(characterName){
+  const voices = speechSynthesis.getVoices();
+  if(!voices || !voices.length) return null;
+  const femaleNames = ['Maha','Dalia']; // scenario mapping
+  const maleNames = ['Yousef'];
+  const wantFemale = femaleNames.some(n => characterName.includes(n));
+  const wantMale = maleNames.some(n => characterName.includes(n));
+  const byLang = voices.filter(v => /en/i.test(v.lang));
+  const tryFind = patterns => byLang.find(v => patterns.some(p => v.name.toLowerCase().includes(p)));
+  if(wantFemale){
+    return tryFind(['zira','samantha','victoria','ava','female','karen','moira']) || byLang[0] || voices[0];
+  }
+  if(wantMale){
+    return tryFind(['david','daniel','alex','fred','male','tom']) || byLang[0] || voices[0];
+  }
+  return byLang[0] || voices[0];
+}
+function speakText(text, characterName, btn){
+  if(!('speechSynthesis' in window)) return;
+  if(currentUtterance){ speechSynthesis.cancel(); currentUtterance = null; document.querySelectorAll('.spk').forEach(b=>b.classList.remove('playing')); if(btn.classList.contains('playing')) return; }
+  const clean = text.replace(/\s+/g,' ').trim();
+  const utter = new SpeechSynthesisUtterance(clean);
+  utter.voice = chooseVoice(characterName);
+  utter.rate = 1; utter.pitch = 1;
+  currentUtterance = utter;
+  btn.classList.add('playing');
+  utter.onend = ()=>{ btn.classList.remove('playing'); currentUtterance = null; };
+  utter.onerror = ()=>{ btn.classList.remove('playing'); currentUtterance = null; };
+  speechSynthesis.speak(utter);
+}
+function stopSpeaking(){ if('speechSynthesis' in window){ speechSynthesis.cancel(); currentUtterance = null; document.querySelectorAll('.spk').forEach(b=>b.classList.remove('playing')); } }
+
+function startMic(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ alert('Voice input is not supported in this browser.'); return; }
+  stopSpeaking();
+  recognition = new SR();
+  recognition.lang='en-US'; recognition.continuous=true; recognition.interimResults=true;
+  let finalTranscript = ''; let baseText = '';
+  baseText = '';
+  el('input').value = '';
+  recognition.onstart = ()=>{ micOn=true; el('micBtn').classList.add('on'); el('micHint').textContent='Recording… click mic again to stop'; };
+  recognition.onresult = (e)=>{
+    let interim = '';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const t = e.results[i][0].transcript;
+      if(e.results[i].isFinal) finalTranscript += t + ' ';
+      else interim += t;
+    }
+    if(micOn){ el('input').value = (baseText + finalTranscript + interim).trim(); autoGrow(el('input')); }
+  };
+  recognition.onend = ()=>{ if(micOn){ micOn=false; el('micBtn').classList.remove('on'); el('micHint').textContent='Click mic to start continuous recording'; } };
+  recognition.start();
+}
+function stopMic(hard=false){
+  if(recognition){ try{ hard ? recognition.abort() : recognition.stop(); }catch(e){} recognition = null; }
+  micOn=false; el('micBtn').classList.remove('on'); el('micHint').textContent='Click mic to start continuous recording';
+}
+function toggleMic(){ if(micOn) stopMic(false); else startMic(); }
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  renderLanding();
+  loadVoices();
+  if('speechSynthesis' in window){ speechSynthesis.onvoiceschanged = loadVoices; }
+  el('backBtn').onclick = backToLanding;
+  el('sendBtn').onclick = sendMessage;
+  el('coachBtn').onclick = getCoaching;
+  el('closeCoach').onclick = ()=>el('coachModal').classList.remove('show');
+  el('obsBtn').onclick = ()=> el('rightPanel').style.display = el('rightPanel').style.display === 'none' ? 'block' : 'none';
+  el('fabObs').onclick = ()=> el('rightPanel').style.display = el('rightPanel').style.display === 'none' ? 'block' : 'none';
+  el('fabPalette').onclick = ()=> window.scrollTo({top:0, behavior:'smooth'});
+  el('input').addEventListener('input', ()=>autoGrow(el('input')));
+  el('input').addEventListener('keydown', e=>{ if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendMessage(); }});
+  el('micBtn').onclick = toggleMic;
+});
+</script>
 </body>
 </html>
